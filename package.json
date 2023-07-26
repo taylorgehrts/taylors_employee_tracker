@@ -1,0 +1,31 @@
+{
+  "name": "taylors_employee_tracker",
+  "version": "1.0.0",
+  "description": "command line application for managing employee data",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/taylorgehrts/taylors_employee_tracker.git"
+  },
+  "keywords": [
+    "node",
+    "mysql",
+    "inquirer",
+    "database"
+  ],
+  "author": "taylor gehrts",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/taylorgehrts/taylors_employee_tracker/issues"
+  },
+  "homepage": "https://github.com/taylorgehrts/taylors_employee_tracker#readme",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "inquirer": "^8.2.4",
+    "mysql2": "^3.5.2"
+  }
+}
