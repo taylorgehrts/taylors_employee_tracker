@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/taylorgehrts/taylors_employee_tracker#readme",
   "dependencies": {
+    "chalk": "^5.3.0",
     "dotenv": "^16.3.1",
     "inquirer": "^8.2.4",
     "mysql2": "^3.5.2"
