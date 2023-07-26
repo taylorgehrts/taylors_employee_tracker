@@ -44,13 +44,13 @@ async function appStart() {
                 "View All Employees",
                 "Add Employee",
                 "Update Employee Role",
-                chalk.red("Remove Employee"),         // Adding chalk.red() to make it red
+                chalk.underline.red("Remove Employee"),         // Adding chalk.red() to make it red
                 "View All Roles",
                 "Add Role",
-                chalk.red("Remove Role"),             // Adding chalk.red() to make it red
+                chalk.underline.red("Remove Role"),             // Adding chalk.red() to make it red
                 "View All Departments",
                 "Add Department",
-                chalk.red("Remove Department"),       // Adding chalk.red() to make it red
+                chalk.underline.red("Remove Department"),       // Adding chalk.red() to make it red
                 "End"
             ]
         })
@@ -102,3 +102,55 @@ async function appStart() {
             }
         });
 }
+
+
+// Function to view all employees
+function viewEmployee() {
+
+  }
+  
+  // Function to add a new employee
+  function addEmployee() {
+
+  }
+  
+  // Function to update an employee's role
+  function updateEmployeeRole() {
+
+  }
+  
+  // Function to remove an employee
+  function removeEmployee() {
+
+  }
+  
+  // Function to view all roles
+  function viewRole() {
+
+  }
+  
+  // Function to add a new role
+  function addRole() {
+
+  }
+  
+  // Function to remove a role
+  function removeRole() {
+
+  }
+  
+  // Function to view all departments
+  function viewDepartment() {
+
+  }
+  
+  // Function to add a new department
+  function addDepartment() {
+
+  }
+  
+  // Function to remove a department
+  function removeDepartment() {
+
+  }
+  
