@@ -44,13 +44,13 @@ async function appStart() {
                 "View All Employees",
                 "Add Employee",
                 "Update Employee Role",
-                chalk.underline.red("Remove Employee"),         
+                "Remove Employee",         
                 "View All Roles",
                 "Add Role",
-                chalk.underline.red("Remove Role"),             
+                "Remove Role",             
                 "View All Departments",
                 "Add Department",
-                chalk.underline.red("Remove Department"),       
+                "Remove Department",       
                 "End"
             ]
         })
@@ -106,7 +106,20 @@ async function appStart() {
 
 // Function to view all employees
 function viewEmployee() {
-    const query = 'SELECT * FROM employee';
+    const query = `
+      SELECT 
+        e.id AS employee_id,
+        e.first_name,
+        e.last_name,
+        r.title,
+        d.dept_name AS department,
+        r.salary,
+        CONCAT(m.first_name, ' ', m.last_name) AS manager
+      FROM employee e
+      LEFT JOIN roles r ON e.role_id = r.id
+      LEFT JOIN department d ON r.department_id = d.id
+      LEFT JOIN employee m ON e.manager_id = m.id`;
+  
     connection.query(query, (err, results) => {
       if (err) throw err;
       console.table(results);
@@ -233,7 +246,51 @@ function viewEmployee() {
   
   // Function to remove an employee
   function removeEmployee() {
-
+    // Fetch the list of employees to display to the user
+    const queryEmployees = 'SELECT * FROM employee';
+    connection.query(queryEmployees, (err, employees) => {
+      if (err) throw err;
+  
+      inquirer
+        .prompt([
+          {
+            type: 'list',
+            name: 'employee_id',
+            message: 'Select the employee you want to remove:',
+            choices: employees.map((emp) => ({
+              name: `${emp.first_name} ${emp.last_name}`,
+              value: emp.id,
+            })),
+          },
+        ])
+        .then((selectedEmployee) => {
+          const chosenEmployee = employees.find((emp) => emp.id === selectedEmployee.employee_id);
+  
+          // Confirm if the user wants to remove the selected employee
+          inquirer
+            .prompt([
+              {
+                type: 'confirm',
+                name: 'confirm',
+                message: `Are you sure you want to remove ${chosenEmployee.first_name} ${chosenEmployee.last_name}?`,
+              },
+            ])
+            .then((confirmation) => {
+              if (confirmation.confirm) {
+                // Perform the DELETE query to remove the employee from the database
+                const deleteQuery = 'DELETE FROM employee WHERE id = ?';
+                connection.query(deleteQuery, [chosenEmployee.id], (err, results) => {
+                  if (err) throw err;
+                  console.log('Employee removed successfully.');
+                  appStart(); // Show the main menu again
+                });
+              } else {
+                console.log('Employee removal canceled.');
+                appStart(); // Show the main menu again
+              }
+            });
+        });
+    });
   }
   
   // Function to view all roles
