@@ -44,13 +44,13 @@ async function appStart() {
                 "View All Employees",
                 "Add Employee",
                 "Update Employee Role",
-                chalk.underline.red("Remove Employee"),         // Adding chalk.red() to make it red
+                chalk.underline.red("Remove Employee"),         
                 "View All Roles",
                 "Add Role",
-                chalk.underline.red("Remove Role"),             // Adding chalk.red() to make it red
+                chalk.underline.red("Remove Role"),             
                 "View All Departments",
                 "Add Department",
-                chalk.underline.red("Remove Department"),       // Adding chalk.red() to make it red
+                chalk.underline.red("Remove Department"),       
                 "End"
             ]
         })
@@ -106,17 +106,129 @@ async function appStart() {
 
 // Function to view all employees
 function viewEmployee() {
-
+    const query = 'SELECT * FROM employee';
+    connection.query(query, (err, results) => {
+      if (err) throw err;
+      console.table(results);
+      appStart(); // Show the main menu again
+    });
   }
   
   // Function to add a new employee
   function addEmployee() {
-
+    // Fetch the list of roles to display to the user
+    const queryRoles = 'SELECT * FROM roles';
+    connection.query(queryRoles, (err, roles) => {
+      if (err) throw err;
+  
+      // Fetch the list of employees to display to the user
+      const queryEmployees = 'SELECT * FROM employee';
+      connection.query(queryEmployees, (err, employees) => {
+        if (err) throw err;
+  
+        inquirer
+          .prompt([
+            {
+              type: 'input',
+              name: 'first_name',
+              message: "Enter the employee's first name:",
+              validate: (input) => {
+                if (input.trim() === '') {
+                  return 'Please enter a valid first name.';
+                }
+                return true;
+              },
+            },
+            {
+              type: 'input',
+              name: 'last_name',
+              message: "Enter the employee's last name:",
+              validate: (input) => {
+                if (input.trim() === '') {
+                  return 'Please enter a valid last name.';
+                }
+                return true;
+              },
+            },
+            {
+              type: 'list',
+              name: 'role_id',
+              message: "Select the employee's role:",
+              choices: roles.map((role) => ({ name: role.title, value: role.id })),
+            },
+            {
+              type: 'list',
+              name: 'manager_id',
+              message: "Select the employee's manager:",
+              choices: [
+                { name: 'None', value: null },
+                ...employees.map((emp) => ({ name: `${emp.first_name} ${emp.last_name}`, value: emp.id })),
+              ],
+            },
+          ])
+          .then((answers) => {
+            const query = 'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)';
+            const { first_name, last_name, role_id, manager_id } = answers;
+            connection.query(query, [first_name, last_name, role_id, manager_id], (err, results) => {
+              if (err) throw err;
+              console.log('Employee added successfully.');
+              appStart(); // Show the main menu again
+            });
+          });
+      });
+    });
   }
   
   // Function to update an employee's role
   function updateEmployeeRole() {
-
+    // Fetch the list of employees to display to the user
+    const queryEmployees = 'SELECT * FROM employee';
+    connection.query(queryEmployees, (err, employees) => {
+      if (err) throw err;
+  
+      inquirer
+        .prompt([
+          {
+            type: 'list',
+            name: 'employee_id',
+            message: 'Select the employee you want to update:',
+            choices: employees.map((emp) => ({
+              name: `${emp.first_name} ${emp.last_name}`,
+              value: emp.id,
+            })),
+          },
+        ])
+        .then((selectedEmployee) => {
+          const chosenEmployee = employees.find((emp) => emp.id === selectedEmployee.employee_id);
+  
+          // Fetch the list of roles to display to the user
+          const queryRoles = 'SELECT * FROM roles';
+          connection.query(queryRoles, (err, roles) => {
+            if (err) throw err;
+  
+            inquirer
+              .prompt([
+                {
+                  type: 'list',
+                  name: 'roles_id',
+                  message: `Select a new role for ${chosenEmployee.first_name} ${chosenEmployee.last_name}:`,
+                  choices: roles.map((roles) => ({ name: roles.title, value: roles.id })),
+                },
+              ])
+              .then((selectedRole) => {
+                const chosenRole = roles.find((roles) => roles.id === selectedRole.roles_id);
+  
+                // Update the employee's role in the database
+                const updateQuery = 'UPDATE employee SET role_id = ? WHERE id = ?';
+                connection.query(updateQuery, [chosenRole.id, chosenEmployee.id], (err, results) => {
+                  if (err) throw err;
+                  console.log('Employee role updated successfully.');
+                  appStart(); // Show the main menu again
+                });
+              });
+          });
+        });
+    });
   }
   
   // Function to remove an employee
