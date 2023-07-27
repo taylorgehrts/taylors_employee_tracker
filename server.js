@@ -47,10 +47,10 @@ async function appStart() {
                 "Remove Employee",         
                 "View All Roles",
                 "Add Role",
-                "Remove Role",             
+                // "Remove Role",             
                 "View All Departments",
                 "Add Department",
-                "Remove Department",       
+                // "Remove Department",       
                 "End"
             ]
         })
@@ -80,9 +80,9 @@ async function appStart() {
                     addRole();
                     break;
 
-                case "Remove Role":
-                    removeRole();
-                    break;
+                // case "Remove Role":
+                //     removeRole();
+                //     break;
 
                 case "View All Departments":
                     viewDepartment();
@@ -92,9 +92,9 @@ async function appStart() {
                     addDepartment();
                     break;
 
-                case "Remove Department":
-                    removeDepartment();
-                    break;
+                // case "Remove Department":
+                //     removeDepartment();
+                //     break;
 
                 case "End":
                     connection.end();
@@ -295,31 +295,168 @@ function viewEmployee() {
   
   // Function to view all roles
   function viewRole() {
-
+    const query = `
+      SELECT
+        r.title AS job_title,
+        r.id AS role_id,
+        d.dept_name AS department,
+        r.salary
+      FROM roles r
+      LEFT JOIN department d ON r.department_id = d.id
+    `;
+  
+    connection.query(query, (err, roles) => {
+      if (err) throw err;
+      console.table(roles);
+      appStart(); // Show the main menu again
+    });
   }
   
   // Function to add a new role
   function addRole() {
-
+    // Fetch the list of departments to display to the user
+    const queryDepartments = 'SELECT * FROM department';
+    connection.query(queryDepartments, (err, departments) => {
+      if (err) throw err;
+  
+      inquirer
+        .prompt([
+          {
+            type: 'input',
+            name: 'title',
+            message: "Enter the role's title:",
+            validate: (input) => {
+              if (input.trim() === '') {
+                return 'Please enter a valid title.';
+              }
+              return true;
+            },
+          },
+          {
+            type: 'input',
+            name: 'salary',
+            message: "Enter the role's salary:",
+            validate: (input) => {
+              if (isNaN(input) || parseFloat(input) <= 0) {
+                return 'Please enter a valid salary.';
+              }
+              return true;
+            },
+          },
+          {
+            type: 'list',
+            name: 'department_id',
+            message: "Select the department for the role:",
+            choices: departments.map((dept) => ({ name: dept.dept_name, value: dept.id })),
+          },
+        ])
+        .then((answers) => {
+          const query = 'INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)';
+          const { title, salary, department_id } = answers;
+          connection.query(query, [title, salary, department_id], (err, results) => {
+            if (err) throw err;
+            console.log('Role added successfully.');
+            appStart(); // Show the main menu again
+          });
+        });
+    });
   }
   
-  // Function to remove a role
-  function removeRole() {
-
-  }
+  // Function to remove a role will get to later
+//   function removeRole() {
+//     const queryRoles = 'SELECT * FROM roles';
+//     connection.query(queryRoles, (err, roles) => {
+//       if (err) throw err;
+  
+//       inquirer
+//         .prompt([
+//           {
+//             type: 'list',
+//             name: 'role_id',
+//             message: 'Select the role you want to remove:',
+//             choices: roles.map((role) => ({
+//               name: role.title,
+//               value: role.id,
+//             })),
+//           },
+//         ])
+//         .then((selectedRole) => {
+//           const chosenRole = roles.find((role) => role.id === selectedRole.role_id);
+  
+//           // Confirm if the user wants to remove the selected role
+//           inquirer
+//             .prompt([
+//               {
+//                 type: 'confirm',
+//                 name: 'confirm',
+//                 message: `Are you sure you want to remove the role: ${chosenRole.title}?`,
+//               },
+//             ])
+//             .then((confirmation) => {
+//               if (confirmation.confirm) {
+//                 // Perform the DELETE query to remove the role from the database
+//                 const deleteQuery = 'DELETE FROM roles WHERE id = ?';
+//                 connection.query(deleteQuery, [chosenRole.id], (err, results) => {
+//                   if (err) throw err;
+//                   console.log('Role removed successfully.');
+//                   appStart(); // Show the main menu again
+//                 });
+//               } else {
+//                 console.log('Role removal canceled.');
+//                 appStart(); // Show the main menu again
+//               }
+//             });
+//         });
+//     });
+//   }
   
   // Function to view all departments
   function viewDepartment() {
-
+    const query = 'SELECT * FROM department';
+    connection.query(query, (err, departments) => {
+      if (err) throw err;
+      console.table(departments);
+      appStart(); // Show the main menu again
+    });
   }
   
   // Function to add a new department
   function addDepartment() {
-
+    inquirer
+      .prompt([
+        {
+          type: 'input',
+          name: 'dept_name',
+          message: "Enter the department's name:",
+          validate: (input) => {
+            if (input.trim() === '') {
+              return 'Please enter a valid department name.';
+            }
+            return true;
+          },
+        },
+      ])
+      .then((answers) => {
+        const query = 'INSERT INTO department (dept_name) VALUES (?)';
+        const { dept_name } = answers;
+        connection.query(query, [dept_name], (err, results) => {
+          if (err) {
+            console.error('Error adding department:', err);
+            appStart(); // Show the main menu again
+          } else {
+            console.log('Department added successfully.');
+            appStart(); // Show the main menu again
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('Error during inquirer prompt:', error);
+        appStart(); // Show the main menu again
+      });
   }
   
-  // Function to remove a department
-  function removeDepartment() {
+  // Function to remove a department will get to later
+//   function removeDepartment() {
 
-  }
+//   }
   
