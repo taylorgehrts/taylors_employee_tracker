@@ -1,3 +1,4 @@
+//connection file to keep this out of the way on the server file
 const mysql = require("mysql2");
 require('dotenv').config();
 

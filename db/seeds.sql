@@ -9,6 +9,7 @@ INSERT INTO department (dept_name) VALUES
 -- Insert sample roles
 INSERT INTO roles (title, salary, department_id) VALUES
   ('HR Manager', 60000.00, 1),
+  --seed file to add initial data to the database
   ('Finance Analyst', 50000.00, 2),
   ('Marketing Coordinator', 45000.00, 3),
   ('Software Engineer', 75000.00, 4),

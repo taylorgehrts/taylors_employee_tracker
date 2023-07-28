@@ -1,3 +1,4 @@
+//imports
 const connection = require('./config/connection');
 const inquirer = require("inquirer");
 // const chalk = require("chalk");
@@ -30,10 +31,10 @@ connection.connect(function (err) {
     appStart();
 });
 
-
+// prompts and function calls
 async function appStart() {
-    const chalkModule = await import("chalk");
-    const chalk = chalkModule.default;
+    // const chalkModule = await import("chalk");
+    // const chalk = chalkModule.default;
     inquirer
         .prompt({
             type: "list",
@@ -54,6 +55,8 @@ async function appStart() {
                 "End"
             ]
         })
+
+        // calling the functions
         .then(function ({ task }) {
             switch (task) {
                 case "View All Employees":
